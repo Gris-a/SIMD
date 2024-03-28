@@ -151,7 +151,7 @@ inline int64_t RenderMandelbrot(sf::Uint8 *pixels, double x_rend, double y_rend,
     int64_t start = TimeCounter();
 #endif
 
-    static const unsigned N_ITERATIONS = 255;
+    static const unsigned N_ITERATIONS = 1023;
 
     static const __v4df MAX_ZERO_OFFSET2_V = _mm256_set1_pd(MAX_ZERO_OFFSET * MAX_ZERO_OFFSET);
     static const __v4df SHIFT_V            = _mm256_set_pd(3, 2, 1, 0);
