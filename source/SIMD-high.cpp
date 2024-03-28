@@ -171,8 +171,8 @@ inline int64_t RenderMandelbrot(sf::Uint8 *pixels, double x_rend, double y_rend,
             __v4df x_n = {};
             __v4df y_n = {};
 
-            volatile __v4di n = {};
-            for(unsigned i = 0; i < N_ITERATIONS; i++)
+            __v4di n = {};
+            for(volatile unsigned i = 0; i < N_ITERATIONS; i++)
             {
                 __v4df x2 = x_n * x_n;
                 __v4df y2 = y_n * y_n;

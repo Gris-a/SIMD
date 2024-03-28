@@ -178,8 +178,8 @@ inline int64_t RenderMandelbrot(sf::Uint8 *pixels, float x_rend, float y_rend, f
             float x_n[VECTOR_SZ] = {};
             float y_n[VECTOR_SZ] = {};
 
-            volatile unsigned n[VECTOR_SZ] = {};
-            for(unsigned i = 0; i < N_ITERATIONS; i++)
+            unsigned n[VECTOR_SZ] = {};
+            for(volatile unsigned i = 0; i < N_ITERATIONS; i++)
             {
                 float x2[VECTOR_SZ] = {}; vmul(x2, x_n, x_n);
                 float y2[VECTOR_SZ] = {}; vmul(y2, y_n, y_n);

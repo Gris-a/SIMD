@@ -153,40 +153,40 @@ inline int64_t RenderMandelbrot(sf::Uint8 *pixels, float x_rend, float y_rend, f
 
     static const unsigned N_ITERATIONS = 255;
 
-    static const __v8sf MAX_ZERO_OFFSET2_V = _mm256_set1_ps(MAX_ZERO_OFFSET * MAX_ZERO_OFFSET);
-    static const __v8sf SHIFT_V            = _mm256_set_ps(7, 6, 5, 4, 3, 2, 1, 0);
+    static const __m256 MAX_ZERO_OFFSET2_V = _mm256_set1_ps(MAX_ZERO_OFFSET * MAX_ZERO_OFFSET);
+    static const __m256 SHIFT_V            = _mm256_set_ps(7, 6, 5, 4, 3, 2, 1, 0);
 
-    __v8sf delta_v         = _mm256_set1_ps(delta);
-    __v8sf delta_v_shifted = SHIFT_V * delta_v;
-    __v8sf packed_adj_v    = 8 * delta_v;
+    __m256 delta_v         = _mm256_set1_ps(delta);
+    __m256 delta_v_shifted = _mm256_mul_ps(SHIFT_V,  delta_v);
+    __m256 packed_adj_v    = _mm256_set1_ps(8 * delta);
 
     size_t pix_arr_pos = 0;
 
-    __v8sf y_0 = _mm256_set1_ps(y_rend);
-    for(unsigned y_pos = 0; y_pos < SCREEN_HEIGHT; y_pos += 1, y_0 -= delta_v)
+    __m256 y_0 = _mm256_set1_ps(y_rend);
+    for(unsigned y_pos = 0; y_pos < SCREEN_HEIGHT; y_pos += 1, y_0 = _mm256_sub_ps(y_0, delta_v))
     {
-        __v8sf x_0 = delta_v_shifted + x_rend;
-        for(unsigned x_pos = 0; x_pos < SCREEN_WIDTH; x_pos += 8, x_0 += packed_adj_v)
+        __m256 x_0 = _mm256_add_ps(_mm256_set1_ps(x_rend), delta_v_shifted);
+        for(unsigned x_pos = 0; x_pos < SCREEN_WIDTH; x_pos += 8, x_0 = _mm256_add_ps(x_0, packed_adj_v))
         {
-            __v8sf x_n = {};
-            __v8sf y_n = {};
+            __m256 x_n = _mm256_setzero_ps();
+            __m256 y_n = _mm256_setzero_ps();
 
-            __v8si n = {};
+            __m256i n = _mm256_setzero_si256();
             for(volatile unsigned i = 0; i < N_ITERATIONS; i++)
             {
-                __v8sf x2 = x_n * x_n;
-                __v8sf y2 = y_n * y_n;
-                __v8sf xy = x_n * y_n;
+                __m256 x2 = _mm256_mul_ps(x_n, x_n);
+                __m256 y2 = _mm256_mul_ps(y_n, y_n);
+                __m256 xy = _mm256_mul_ps(x_n, y_n);
 
-                __v8sf cmp = ((x2 + y2) < MAX_ZERO_OFFSET2_V);
+                __m256 cmp = _mm256_cmp_ps(_mm256_add_ps(x2, y2),  MAX_ZERO_OFFSET2_V, _CMP_LT_OQ);
 
                 unsigned mask = _mm256_movemask_ps(cmp);
                 if(mask == 0) break;
 
-                n -= reinterpret_cast<__v8si>(cmp);
+                n = _mm256_sub_epi32(n, _mm256_castps_si256(cmp));
 
-                x_n = x2 - y2 + x_0;
-                y_n = xy + xy + y_0;
+                x_n = _mm256_add_ps(_mm256_sub_ps(x2, y2), x_0);
+                y_n = _mm256_add_ps(_mm256_add_ps(xy, xy), y_0);
             }
 
 #ifdef RENDER
