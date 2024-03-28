@@ -7,8 +7,8 @@
 #include <math.h>
 #include <string.h>
 
-const unsigned SCREEN_WIDTH  = 1920;
-const unsigned SCREEN_HEIGHT = 1080;
+const unsigned SCREEN_WIDTH  = 400;
+const unsigned SCREEN_HEIGHT = 400;
 
 const unsigned PIXELS_PER_OFFSET = 20;
 const double MAX_ZERO_OFFSET     = 2;
